@@ -2,6 +2,8 @@ from datetime import date
 
 from django.db import models
 
+from .text_utils import normalize_user_text
+
 
 class Card(models.Model):
     term = models.CharField(max_length=200, unique=True)
@@ -16,6 +18,10 @@ class Card(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        self.term = normalize_user_text(self.term)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.term
 
@@ -27,6 +33,10 @@ class Translation(models.Model):
 
     class Meta:
         ordering = ["order"]
+
+    def save(self, *args, **kwargs):
+        self.text = normalize_user_text(self.text)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.text
@@ -40,6 +50,11 @@ class Example(models.Model):
 
     class Meta:
         ordering = ["order"]
+
+    def save(self, *args, **kwargs):
+        self.text = normalize_user_text(self.text)
+        self.translation = normalize_user_text(self.translation)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.text[:60]

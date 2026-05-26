@@ -198,11 +198,12 @@ class PracticeViewTests(TestCase):
 
         self.assertEqual(resp.status_code, 200)
         # both translations are in the markup (one as prompt, the other under
-        # "Other translations" in the hidden reveal — either can be the prompt)
-        self.assertContains(resp, "суровый")
-        self.assertContains(resp, "резкий")
-        # the term is in the reveal
-        self.assertContains(resp, "harsh")
+        # "Other translations" in the hidden reveal — either can be the prompt).
+        # Translation.save() capitalizes the first letter.
+        self.assertContains(resp, "Суровый")
+        self.assertContains(resp, "Резкий")
+        # the term is in the reveal (Card.save() capitalizes the first letter)
+        self.assertContains(resp, "Harsh")
         # the chosen prompt is recorded in the session
         prompts = self.client.session[practice._prompts_key(RU_EN)]
         chosen_id = prompts[str(card.id)]
