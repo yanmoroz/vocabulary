@@ -112,12 +112,33 @@
     }
 
     .term {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
       font-size: 2rem;
       font-weight: 600;
       letter-spacing: -0.02em;
       text-align: center;
       margin: 0.5rem 0 1.5rem;
     }
+    .tts-btn {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      background: rgba(0, 122, 255, 0.12);
+      color: var(--accent);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background-color 0.15s ease, transform 0.05s ease;
+    }
+    .tts-btn:hover { background: rgba(0, 122, 255, 0.22); }
+    .tts-btn:active { transform: scale(0.92); }
+    .tts-btn[aria-busy="true"] { background: var(--accent); color: #fff; }
 
     .btn-primary {
       display: block;
@@ -326,6 +347,23 @@
     document.body.addEventListener("htmx:configRequest", (e) => {
       const csrf = document.cookie.split("; ").find(r => r.startsWith("csrftoken="));
       if (csrf) e.detail.headers["X-CSRFToken"] = csrf.split("=")[1];
+    });
+
+    // Web Speech API: speak the English term when a .tts-btn is clicked.
+    // Event delegation on body so it works after htmx swaps the card.
+    document.body.addEventListener("click", (e) => {
+      const btn = e.target.closest(".tts-btn");
+      if (!btn) return;
+      e.preventDefault();
+      const text = btn.dataset.tts;
+      if (!text || !("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel(); // stop any utterance in flight
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "en-US";
+      u.rate = 0.95;
+      btn.setAttribute("aria-busy", "true");
+      u.onend = u.onerror = () => btn.removeAttribute("aria-busy");
+      window.speechSynthesis.speak(u);
     });
   </script>
 </body>

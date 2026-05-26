@@ -222,9 +222,9 @@ class PracticeViewTests(TestCase):
         # Multiple subsequent requests must show the same prompt
         for _ in range(5):
             resp = self.client.get(self._practice_url(RU_EN))
-            # The .term div in our template wraps the prompt
+            # The .term div wraps the prompt in a <span>
             self.assertIn(
-                f'<div class="term">{chosen_text}</div>',
+                f'<div class="term"><span>{chosen_text}</span></div>',
                 resp.content.decode(),
             )
 
