@@ -1,0 +1,72 @@
+{% load markdown_extras %}
+{% if card %}
+  {% if mode == "practice" and progress %}
+    <p class="progress">Card {{ progress.0 }} of {{ progress.1 }}</p>
+  {% endif %}
+  <div x-data="{ shown: false }">
+    <div class="card">
+      <div class="term">{{ card.term }}</div>
+
+      <button class="btn-primary" x-show="!shown" @click="shown = true">Show answer</button>
+
+      <div class="answer"
+           x-show="shown"
+           x-cloak
+           x-transition.opacity.duration.200ms>
+        <h3>Translations</h3>
+        <ul>
+          {% for t in card.translations.all %}<li>{{ t.text }}</li>{% endfor %}
+        </ul>
+
+        {% if card.examples.all %}
+          <h3>Examples</h3>
+          <ul>
+            {% for e in card.examples.all %}
+              <li>
+                <em>{{ e.text }}</em>
+                {% if e.translation %}<br><small>{{ e.translation }}</small>{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if card.notes_md %}
+          <h3>Notes</h3>
+          <div class="notes">{{ card.notes_md|markdown }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if mode == "practice" %}
+      <button class="btn-primary next-btn"
+              x-show="shown"
+              x-cloak
+              x-transition.opacity.duration.200ms
+              hx-post="{% url 'practice_next' %}"
+              hx-target="#card-slot">Next</button>
+    {% else %}
+      <div class="ratings" x-show="shown" x-cloak x-transition.opacity.duration.200ms>
+        <button class="again" hx-post="{% url 'rate' card.id 0 %}" hx-target="#card-slot">Again</button>
+        <button class="hard"  hx-post="{% url 'rate' card.id 3 %}" hx-target="#card-slot">Hard</button>
+        <button class="good"  hx-post="{% url 'rate' card.id 4 %}" hx-target="#card-slot">Good</button>
+        <button class="easy"  hx-post="{% url 'rate' card.id 5 %}" hx-target="#card-slot">Easy</button>
+      </div>
+    {% endif %}
+  </div>
+{% else %}
+  {% if mode == "practice" %}
+    {% if progress and progress.1 > 0 %}
+      <div class="empty">
+        <p>Session complete!</p>
+        <form method="post" action="{% url 'practice_restart' %}" hx-post="{% url 'practice_restart' %}" hx-target="#card-slot">
+          {% csrf_token %}
+          <button type="submit" class="btn-primary" style="max-width: 240px; margin: 1rem auto 0;">Start over</button>
+        </form>
+      </div>
+    {% else %}
+      <p class="empty">No cards yet. <a href="/admin/">Add some</a> in admin.</p>
+    {% endif %}
+  {% else %}
+    <p class="empty">No cards due. Come back tomorrow or <a href="/admin/">add more</a>.</p>
+  {% endif %}
+{% endif %}
