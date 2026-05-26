@@ -5,3 +5,5 @@ django-admin-sortable2>=2.3
 python-decouple>=3.8
 gunicorn>=23.0
 whitenoise>=6.8
+dj-database-url>=2.3
+psycopg[binary]>=3.2
