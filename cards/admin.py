@@ -4,6 +4,8 @@ from adminsortable2.admin import (
     SortableTabularInline,
 )
 from django.contrib import admin
+from django.db import models
+from django.forms import Textarea
 
 from .models import Card, Example, Translation
 
@@ -16,6 +18,9 @@ class TranslationInline(SortableTabularInline):
 class ExampleInline(SortableStackedInline):
     model = Example
     extra = 0
+    formfield_overrides = {
+        models.TextField: {"widget": Textarea(attrs={"rows": 2})},
+    }
 
 
 @admin.register(Card)

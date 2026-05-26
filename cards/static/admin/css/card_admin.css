@@ -1,10 +1,68 @@
-/* django-admin-sortable2: replace the dotted drag-handle texture with a solid surface */
+/* Saved stacked Example: 2-column grid — [ ≡ handle ][ form fields ].
+   The ✕ pins to the top-right of the card (absolute, escapes from h3). */
+.inline-group[data-inline-type="stacked"] .inline-related.has_original {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    align-items: start;
+}
 
-fieldset.sortable .inline-related.has_original h3 {
+.inline-group[data-inline-type="stacked"] .inline-related.has_original > h3 {
+    grid-column: 1;
+    grid-row: 1;
     background: var(--body-bg) !important;
     background-image: none !important;
+    border: none;
+    margin: 0;
+    padding: 18px 0 0 14px !important;
     height: auto;
-    padding-top: 8px;
+    min-height: auto;
+    position: static; /* so span.delete absolute → inline-related, not h3 */
+    cursor: grab;
+}
+
+.inline-group[data-inline-type="stacked"] .inline-related.has_original > h3 > b,
+.inline-group[data-inline-type="stacked"] .inline-related.has_original > h3 > .inline_label,
+.inline-group[data-inline-type="stacked"] .inline-related.has_original > h3 > a {
+    display: none !important;
+}
+
+.inline-group[data-inline-type="stacked"] .inline-related.has_original > h3::before {
+    content: "\2261";
+    display: block;
+    width: 26px;
+    height: 26px;
+    background: rgba(127, 127, 127, 0.18);
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.55);
+    text-align: center;
+    line-height: 26px;
+}
+
+.inline-group[data-inline-type="stacked"] .inline-related.has_original > fieldset {
+    grid-column: 2;
+    grid-row: 1;
+    padding-right: 56px !important; /* room for the ✕ */
+}
+
+/* Vertically center the "Text" / "Translation" labels next to their textareas */
+.inline-group[data-inline-type="stacked"] .inline-related .form-row .flex-container {
+    align-items: center;
+}
+
+/* Minimal h3 for newly-added (unsaved) stacked Examples — no drag handle yet */
+.inline-group[data-inline-type="stacked"] .inline-related:not(.has_original) h3 {
+    background: var(--body-bg) !important;
+    border: none;
+    margin: 0;
+    padding: 11px 14px !important;
+    min-height: 48px;
+    position: relative;
+}
+.inline-group[data-inline-type="stacked"] .inline-related:not(.has_original) h3 > b,
+.inline-group[data-inline-type="stacked"] .inline-related:not(.has_original) h3 > .inline_label {
+    display: none !important;
 }
 
 /* Hide the model's __str__ + "Change" link rendered inside the drag column,
@@ -100,9 +158,27 @@ fieldset.sortable :is(.inline-related, td.original) span.sort {
     margin: 0;
 }
 
-/* Style the DELETE checkbox as a circular ✕ button (both tabular and stacked) */
+/* Stacked Example saved-row: pin delete to top-right of inline-related,
+   aligned vertically with the ≡ handle (and the first form-row). */
+.inline-group .inline-related h3 span.delete {
+    position: absolute;
+    top: 18px;
+    right: 14px;
+    margin: 0;
+    transform: none;
+    float: none !important;
+    flex: none !important;
+}
+.inline-group .inline-related h3 span.delete label {
+    display: none !important;
+}
+
+/* Style the DELETE checkbox as a circular ✕ button (tabular td.delete,
+   stacked form-row.field-DELETE if Django renders one, and the in-h3
+   span.delete used by saved stacked rows). */
 .inline-group td.delete input[type=checkbox],
-.inline-group .form-row.field-DELETE input[type=checkbox] {
+.inline-group .form-row.field-DELETE input[type=checkbox],
+.inline-group .inline-related h3 span.delete input[type=checkbox] {
     appearance: none;
     -webkit-appearance: none;
     width: 28px;
@@ -117,7 +193,8 @@ fieldset.sortable :is(.inline-related, td.original) span.sort {
     transition: background-color 0.15s ease, transform 0.05s ease;
 }
 .inline-group td.delete input[type=checkbox]::after,
-.inline-group .form-row.field-DELETE input[type=checkbox]::after {
+.inline-group .form-row.field-DELETE input[type=checkbox]::after,
+.inline-group .inline-related h3 span.delete input[type=checkbox]::after {
     content: "×";
     color: #FF3B30;
     position: absolute;
@@ -130,19 +207,26 @@ fieldset.sortable :is(.inline-related, td.original) span.sort {
     font-weight: 400;
 }
 .inline-group td.delete input[type=checkbox]:hover,
-.inline-group .form-row.field-DELETE input[type=checkbox]:hover {
+.inline-group .form-row.field-DELETE input[type=checkbox]:hover,
+.inline-group .inline-related h3 span.delete input[type=checkbox]:hover {
     background: rgba(255, 59, 48, 0.28);
 }
 .inline-group td.delete input[type=checkbox]:active,
 .inline-group .form-row.field-DELETE input[type=checkbox]:active {
     transform: scale(0.94);
 }
+.inline-group .inline-related h3 span.delete input[type=checkbox]:active {
+    /* keep the parent's translate while shrinking */
+    transform: scale(0.94);
+}
 .inline-group td.delete input[type=checkbox]:checked,
-.inline-group .form-row.field-DELETE input[type=checkbox]:checked {
+.inline-group .form-row.field-DELETE input[type=checkbox]:checked,
+.inline-group .inline-related h3 span.delete input[type=checkbox]:checked {
     background: #FF3B30;
 }
 .inline-group td.delete input[type=checkbox]:checked::after,
-.inline-group .form-row.field-DELETE input[type=checkbox]:checked::after {
+.inline-group .form-row.field-DELETE input[type=checkbox]:checked::after,
+.inline-group .inline-related h3 span.delete input[type=checkbox]:checked::after {
     color: #ffffff;
 }
 

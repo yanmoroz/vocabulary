@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="modes">
+    <a class="mode-btn" href="{% url 'review' %}">
+      <div class="mode-title">Review</div>
+      <div class="mode-sub">Study cards due today · updates SRS schedule</div>
+    </a>
+    <a class="mode-btn" href="{% url 'practice' direction='en-ru' %}">
+      <div class="mode-title">Practice EN to RU</div>
+      <div class="mode-sub">See English term · recall Russian translation</div>
+    </a>
+    <a class="mode-btn" href="{% url 'practice' direction='ru-en' %}">
+      <div class="mode-title">Practice RU to EN</div>
+      <div class="mode-sub">See Russian translation · recall English term</div>
+    </a>
+  </div>
+{% endblock %}

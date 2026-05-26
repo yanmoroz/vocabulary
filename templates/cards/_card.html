@@ -5,7 +5,11 @@
   {% endif %}
   <div x-data="{ shown: false }">
     <div class="card">
-      <div class="term">{{ card.term }}</div>
+      {% if direction == "ru-en" %}
+        <div class="term">{{ prompt_translation.text }}</div>
+      {% else %}
+        <div class="term">{{ card.term }}</div>
+      {% endif %}
 
       <button class="btn-primary" x-show="!shown" @click="shown = true">Show answer</button>
 
@@ -13,10 +17,27 @@
            x-show="shown"
            x-cloak
            x-transition.opacity.duration.200ms>
-        <h3>Translations</h3>
-        <ul>
-          {% for t in card.translations.all %}<li>{{ t.text }}</li>{% endfor %}
-        </ul>
+
+        {% if direction == "ru-en" %}
+          <h3>Term</h3>
+          <ul><li>{{ card.term }}</li></ul>
+
+          {% with translations=card.translations.all %}
+            {% if translations|length > 1 %}
+              <h3>Other translations</h3>
+              <ul>
+                {% for t in translations %}
+                  {% if t.id != prompt_translation.id %}<li>{{ t.text }}</li>{% endif %}
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endwith %}
+        {% else %}
+          <h3>Translations</h3>
+          <ul>
+            {% for t in card.translations.all %}<li>{{ t.text }}</li>{% endfor %}
+          </ul>
+        {% endif %}
 
         {% if card.examples.all %}
           <h3>Examples</h3>
@@ -42,7 +63,7 @@
               x-show="shown"
               x-cloak
               x-transition.opacity.duration.200ms
-              hx-post="{% url 'practice_next' %}"
+              hx-post="{% url 'practice_next' direction=direction %}"
               hx-target="#card-slot">Next</button>
     {% else %}
       <div class="ratings" x-show="shown" x-cloak x-transition.opacity.duration.200ms>
@@ -58,13 +79,23 @@
     {% if progress and progress.1 > 0 %}
       <div class="empty">
         <p>Session complete!</p>
-        <form method="post" action="{% url 'practice_restart' %}" hx-post="{% url 'practice_restart' %}" hx-target="#card-slot">
+        <form method="post"
+              action="{% url 'practice_restart' direction=direction %}"
+              hx-post="{% url 'practice_restart' direction=direction %}"
+              hx-target="#card-slot">
           {% csrf_token %}
           <button type="submit" class="btn-primary" style="max-width: 240px; margin: 1rem auto 0;">Start over</button>
         </form>
       </div>
     {% else %}
-      <p class="empty">No cards yet. <a href="/admin/">Add some</a> in admin.</p>
+      <p class="empty">
+        {% if direction == "ru-en" %}
+          No cards with translations yet.
+        {% else %}
+          No cards yet.
+        {% endif %}
+        <a href="/admin/">Add some</a> in admin.
+      </p>
     {% endif %}
   {% else %}
     <p class="empty">No cards due. Come back tomorrow or <a href="/admin/">add more</a>.</p>

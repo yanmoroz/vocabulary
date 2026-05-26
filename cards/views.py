@@ -1,6 +1,7 @@
 from datetime import date
 
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
@@ -17,6 +18,16 @@ def _next_due_card():
         .order_by("next_review", "id")
         .first()
     )
+
+
+def _validate_direction(direction: str) -> None:
+    if direction not in practice_mod.DIRECTIONS:
+        raise Http404("Unknown practice direction")
+
+
+@login_required
+def home(request):
+    return render(request, "home.html")
 
 
 @login_required
@@ -38,34 +49,36 @@ def rate(request, card_id: int, quality: int):
     })
 
 
-@login_required
-def practice(request):
-    if not practice_mod.has_session(request.session):
-        practice_mod.start_session(request.session)
-    return render(request, "cards/practice.html", {
-        "card": practice_mod.current_card(request.session),
+def _practice_context(session, direction: str) -> dict:
+    card = practice_mod.current_card(session, direction)
+    return {
+        "card": card,
         "mode": "practice",
-        "progress": practice_mod.progress(request.session),
-    })
+        "direction": direction,
+        "progress": practice_mod.progress(session, direction),
+        "prompt_translation": practice_mod.prompt_translation_for(session, direction, card),
+    }
 
 
 @login_required
-@require_POST
-def practice_next(request):
-    practice_mod.advance(request.session)
-    return render(request, "cards/_card.html", {
-        "card": practice_mod.current_card(request.session),
-        "mode": "practice",
-        "progress": practice_mod.progress(request.session),
-    })
+def practice(request, direction: str):
+    _validate_direction(direction)
+    if not practice_mod.has_session(request.session, direction):
+        practice_mod.start_session(request.session, direction)
+    return render(request, "cards/practice.html", _practice_context(request.session, direction))
 
 
 @login_required
 @require_POST
-def practice_restart(request):
-    practice_mod.start_session(request.session)
-    return render(request, "cards/_card.html", {
-        "card": practice_mod.current_card(request.session),
-        "mode": "practice",
-        "progress": practice_mod.progress(request.session),
-    })
+def practice_next(request, direction: str):
+    _validate_direction(direction)
+    practice_mod.advance(request.session, direction)
+    return render(request, "cards/_card.html", _practice_context(request.session, direction))
+
+
+@login_required
+@require_POST
+def practice_restart(request, direction: str):
+    _validate_direction(direction)
+    practice_mod.start_session(request.session, direction)
+    return render(request, "cards/_card.html", _practice_context(request.session, direction))

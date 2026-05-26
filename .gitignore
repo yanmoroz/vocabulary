@@ -22,3 +22,6 @@ local_settings.py
 .idea/
 *.swp
 .DS_Store
+
+# Claude Code
+.claude/settings.local.json
