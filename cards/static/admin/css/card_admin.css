@@ -1,0 +1,183 @@
+/* django-admin-sortable2: replace the dotted drag-handle texture with a solid surface */
+
+fieldset.sortable .inline-related.has_original h3 {
+    background: var(--body-bg) !important;
+    background-image: none !important;
+    height: auto;
+    padding-top: 8px;
+}
+
+/* Hide the model's __str__ + "Change" link rendered inside the drag column,
+   but keep the <p> as a clickable drag-handle icon for sortable2. */
+fieldset.sortable table tr.form-row.has_original td.original p {
+    background: rgba(127, 127, 127, 0.18) !important;
+    background-image: none !important;
+    width: 26px !important;
+    height: 26px;
+    margin: 0;
+    padding: 0;
+    border-radius: 6px;
+    position: relative;
+    font-size: 0;
+    color: transparent;
+    cursor: grab;
+}
+fieldset.sortable table tr.form-row.has_original td.original p::before {
+    content: "\2261"; /* ≡ horizontal lines as drag affordance */
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.55);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+fieldset.sortable table tr.form-row.has_original td.original p a {
+    display: none !important;
+}
+
+/* Hide sortable2's up/down arrow controls — we rely on drag-and-drop only */
+fieldset.sortable :is(.inline-related, td.original) span.sort {
+    display: none !important;
+}
+
+/* Drop Django admin's zebra striping on the Translation/Example inlines */
+.inline-group tr:nth-child(odd),
+.inline-group tr:nth-child(even),
+.inline-group tr:nth-child(even) .errorlist,
+.inline-group tr:nth-child(odd) + .row-form-errors,
+.inline-group tr:nth-child(odd) + .row-form-errors .errorlist,
+.inline-group .inline-related,
+.inline-group .row-form-errors {
+    background: var(--body-bg) !important;
+}
+
+/* Hide column titles in the tabular Translations inline (TEXT, DELETE?, ORDER) */
+.inline-group .tabular thead { display: none !important; }
+
+/* Layout: text column fills remaining width, drag + delete columns are min-content */
+.inline-group .tabular table { width: 100%; table-layout: auto; }
+.inline-group .tabular tbody td {
+    vertical-align: middle;
+    padding: 14px 12px !important;
+}
+.inline-group .tabular tbody td.field-text { width: 100%; }
+.inline-group .tabular tbody td.field-text input[type=text],
+.inline-group .tabular tbody td.field-text .vTextField {
+    width: 100%;
+    box-sizing: border-box;
+}
+.inline-group .tabular tbody td.original,
+.inline-group .tabular tbody td.delete {
+    width: 1px;
+    white-space: nowrap;
+}
+/* Hide the order column if sortable2 leaves an empty <td> behind */
+.inline-group .tabular td.field-order { display: none !important; }
+
+/* Hide the DELETE? label on the stacked Examples inline */
+.inline-group .inline-related .form-row.field-DELETE label,
+.inline-group .inline-related fieldset .form-row.field-DELETE label {
+    display: none !important;
+}
+
+/* Make stacked inline a positioning context so we can pin the delete button top-right */
+.inline-group .inline-related { position: relative; }
+
+/* Float the DELETE row to the top-right of each stacked Example */
+.inline-group .inline-related .form-row.field-DELETE {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    z-index: 1;
+}
+.inline-group .inline-related .form-row.field-DELETE > div {
+    padding: 0;
+    margin: 0;
+}
+
+/* Style the DELETE checkbox as a circular ✕ button (both tabular and stacked) */
+.inline-group td.delete input[type=checkbox],
+.inline-group .form-row.field-DELETE input[type=checkbox] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 59, 48, 0.15);
+    border: none;
+    cursor: pointer;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.15s ease, transform 0.05s ease;
+}
+.inline-group td.delete input[type=checkbox]::after,
+.inline-group .form-row.field-DELETE input[type=checkbox]::after {
+    content: "×";
+    color: #FF3B30;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 400;
+}
+.inline-group td.delete input[type=checkbox]:hover,
+.inline-group .form-row.field-DELETE input[type=checkbox]:hover {
+    background: rgba(255, 59, 48, 0.28);
+}
+.inline-group td.delete input[type=checkbox]:active,
+.inline-group .form-row.field-DELETE input[type=checkbox]:active {
+    transform: scale(0.94);
+}
+.inline-group td.delete input[type=checkbox]:checked,
+.inline-group .form-row.field-DELETE input[type=checkbox]:checked {
+    background: #FF3B30;
+}
+.inline-group td.delete input[type=checkbox]:checked::after,
+.inline-group .form-row.field-DELETE input[type=checkbox]:checked::after {
+    color: #ffffff;
+}
+
+/* Match Django's JS-added delete link (newly spawned rows) to the saved-row ✕ */
+.inline-group .inline-deletelink {
+    background-image: none !important;
+    background-color: rgba(255, 59, 48, 0.15) !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 28px !important;
+    height: 28px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-indent: 0 !important;
+    font-size: 0 !important;
+    color: transparent !important;
+    line-height: 28px !important;
+    position: relative;
+    transition: background-color 0.15s ease, transform 0.05s ease;
+}
+.inline-group .inline-deletelink::after {
+    content: "×";
+    color: #FF3B30;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 28px;
+    position: absolute;
+    inset: 0;
+    text-align: center;
+    text-indent: 0;
+}
+.inline-group .inline-deletelink:hover,
+.inline-group .inline-deletelink:focus {
+    background-color: rgba(255, 59, 48, 0.28) !important;
+}
+.inline-group .inline-deletelink:active {
+    transform: scale(0.94);
+}

@@ -26,7 +26,7 @@ class Translation(models.Model):
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ["order", "id"]
+        ordering = ["order"]
 
     def __str__(self):
         return self.text
@@ -39,7 +39,7 @@ class Example(models.Model):
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ["order", "id"]
+        ordering = ["order"]
 
     def __str__(self):
         return self.text[:60]
