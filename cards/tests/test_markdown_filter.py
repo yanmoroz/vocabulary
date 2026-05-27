@@ -22,6 +22,12 @@ class MarkdownFilterTests(SimpleTestCase):
         self.assertIn('href="https://example.com"', out)
         self.assertIn('title="t"', out)
 
+    def test_renders_tables(self):
+        out = markdown_filter("| a | b |\n|---|---|\n| 1 | 2 |\n")
+        self.assertIn("<table>", out)
+        self.assertIn("<th>a</th>", out)
+        self.assertIn("<td>1</td>", out)
+
     def test_handles_empty(self):
         self.assertEqual(markdown_filter(""), "")
         self.assertEqual(markdown_filter(None), "")

@@ -8,8 +8,9 @@ register = template.Library()
 ALLOWED_TAGS = frozenset({
     "p", "br", "strong", "em", "code", "pre", "blockquote",
     "ul", "ol", "li", "a", "h1", "h2", "h3", "h4",
+    "table", "thead", "tbody", "tr", "th", "td",
 })
-ALLOWED_ATTRS = {"a": ["href", "title"]}
+ALLOWED_ATTRS = {"a": ["href", "title"], "th": ["align"], "td": ["align"]}
 
 
 @register.filter(name="markdown")
