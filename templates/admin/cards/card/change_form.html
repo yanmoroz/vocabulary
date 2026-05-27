@@ -1,0 +1,124 @@
+{% extends "admin/change_form.html" %}
+
+{% block object-tools-items %}
+  <li>
+    <a href="{% url 'admin:cards_card_preview' original.pk %}"
+       class="viewsitelink card-preview-trigger"
+       target="_blank"
+       rel="noopener">Preview</a>
+  </li>
+  {{ block.super }}
+{% endblock %}
+
+{% block extrahead %}{{ block.super }}
+{% if change %}
+<style>
+  .card-preview-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.55);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  .card-preview-modal.open { display: flex; }
+
+  .card-preview-modal__inner {
+    position: relative;
+    width: 100%;
+    max-width: 680px;
+    height: min(92vh, 900px);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+    background: #f2f2f7;
+  }
+  @media (prefers-color-scheme: dark) {
+    .card-preview-modal__inner { background: #000; }
+  }
+
+  .card-preview-modal__iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    background: transparent;
+  }
+
+  .card-preview-modal__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, transform 0.05s ease;
+  }
+  .card-preview-modal__close:hover { background: rgba(0, 0, 0, 0.75); }
+  .card-preview-modal__close:active { transform: scale(0.94); }
+
+  body.card-preview-open { overflow: hidden; }
+</style>
+<script>
+  (function () {
+    document.addEventListener("DOMContentLoaded", function () {
+      var trigger = document.querySelector(".card-preview-trigger");
+      if (!trigger) return;
+      var previewUrl = trigger.getAttribute("href");
+
+      var modal = document.createElement("div");
+      modal.className = "card-preview-modal";
+      modal.setAttribute("role", "dialog");
+      modal.setAttribute("aria-modal", "true");
+      modal.setAttribute("aria-label", "Card preview");
+      modal.innerHTML =
+        '<div class="card-preview-modal__inner">' +
+          '<button type="button" class="card-preview-modal__close" aria-label="Close preview">×</button>' +
+          '<iframe class="card-preview-modal__iframe" title="Card preview" src="about:blank"></iframe>' +
+        '</div>';
+      document.body.appendChild(modal);
+
+      var iframe = modal.querySelector(".card-preview-modal__iframe");
+      var closeBtn = modal.querySelector(".card-preview-modal__close");
+
+      function openModal() {
+        iframe.src = previewUrl;
+        modal.classList.add("open");
+        document.body.classList.add("card-preview-open");
+      }
+      function closeModal() {
+        modal.classList.remove("open");
+        document.body.classList.remove("card-preview-open");
+        iframe.src = "about:blank";
+      }
+
+      trigger.addEventListener("click", function (e) {
+        e.preventDefault();
+        openModal();
+      });
+      closeBtn.addEventListener("click", closeModal);
+      modal.addEventListener("click", function (e) {
+        if (e.target === modal) closeModal();
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
+      });
+    });
+  })();
+</script>
+{% endif %}
+{% endblock %}

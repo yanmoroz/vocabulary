@@ -327,19 +327,21 @@
   </style>
 </head>
 <body>
-  {% if user.is_authenticated %}
-    <div class="topbar">
-      <a href="{% url 'home' %}" class="brand">Flashcards</a>
-      <span class="links">
-        <a href="/admin/">admin</a>
-        <span class="sep">·</span>
-        <form action="{% url 'logout' %}" method="post">
-          {% csrf_token %}
-          <button type="submit">logout</button>
-        </form>
-      </span>
-    </div>
-  {% endif %}
+  {% block topbar %}
+    {% if user.is_authenticated %}
+      <div class="topbar">
+        <a href="{% url 'home' %}" class="brand">Flashcards</a>
+        <span class="links">
+          <a href="/admin/">admin</a>
+          <span class="sep">·</span>
+          <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">logout</button>
+          </form>
+        </span>
+      </div>
+    {% endif %}
+  {% endblock %}
 
   {% block content %}{% endblock %}
 
